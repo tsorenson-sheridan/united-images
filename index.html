@@ -1,1 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNG Files List</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; }
+        h2 { color: #333; }
+        ul { list-style: none; padding: 0; }
+        li { margin: 5px 0; }
+        a { text-decoration: none; color: blue; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h2>PNG Files in This Folder:</h2>
+    <ul id="file-list">Loading...</ul>
+
+    <script>
+        async function fetchFiles() {
+            try {
+                const response = await fetch(".");
+                const text = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, "text/html");
+                const links = Array.from(doc.querySelectorAll("a"));
+
+                const fileList = document.getElementById("file-list");
+                fileList.innerHTML = "";
+
+                links.forEach(link => {
+                    const fileName = link.getAttribute("href");
+                    if (fileName.toLowerCase().endsWith(".png")) {
+                        const listItem = document.createElement("li");
+                        const fileLink = document.createElement("a");
+                        fileLink.href = fileName;
+                        fileLink.textContent = fileName;
+                        listItem.appendChild(fileLink);
+                        fileList.appendChild(listItem);
+                    }
+                });
+
+                if (!fileList.hasChildNodes()) {
+                    fileList.innerHTML = "<li>No PNG files found.</li>";
+                }
+
+            } catch (error) {
+                document.getElementById("file-list").textContent = "Error loading file list.";
+                console.error("Error fetching files:", error);
+            }
+        }
+
+        fetchFiles();
+    </script>
+</body>
+</html>
 
