@@ -18,27 +18,27 @@
     <ul id="file-list">Loading...</ul>
 
     <script>
-        async function fetchFiles() {
-            try {
-                const response = await fetch(".");
-                const text = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(text, "text/html");
-                const links = Array.from(doc.querySelectorAll("a"));
+        async function fetchGitHubFiles() {
+            const owner = "tsorenson-sheridan";
+            const repo = "united-images";
+            const path = ""; // Root folder
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
 
+            try {
+                const response = await fetch(url);
+                const files = await response.json();
                 const fileList = document.getElementById("file-list");
                 fileList.innerHTML = "";
 
-                links.forEach(link => {
-                    const fileName = link.getAttribute("href");
-                   
+                files.forEach(file => {
+                    if (file.name.toLowerCase().endsWith(".png")) {
                         const listItem = document.createElement("li");
                         const fileLink = document.createElement("a");
-                        fileLink.href = fileName;
-                        fileLink.textContent = fileName;
+                        fileLink.href = file.download_url;
+                        fileLink.textContent = file.name;
                         listItem.appendChild(fileLink);
                         fileList.appendChild(listItem);
-                    
+                    }
                 });
 
                 if (!fileList.hasChildNodes()) {
@@ -51,8 +51,7 @@
             }
         }
 
-        fetchFiles();
+        fetchGitHubFiles();
     </script>
 </body>
 </html>
-
